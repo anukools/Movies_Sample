@@ -171,17 +171,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         networkStateReceiver.addListener(this);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        getActivity().registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
-    }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        getActivity().unregisterReceiver(networkStateReceiver);
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -241,7 +231,6 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.e(TAG, "onCreateView");
         if (savedInstanceState != null) {
             SORT_BY = savedInstanceState.getString(SORTED_VALUE_KEY);
             titleName = savedInstanceState.getString(SCREEN_TITLE);
@@ -254,8 +243,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
                 ((ViewGroup) rootView.getParent()).removeView(rootView);
             }
         }
-        // handler draw over view
-        UIViewsHandler.handleHomePageView(getActivity(), rootView);
+
         return rootView;
     }
 
@@ -339,6 +327,24 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+
+        // handler draw over view
+        UIViewsHandler.handleHomePageView(getActivity(), rootView);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(networkStateReceiver);
+
+
+        // hide when the view changed
+        PointerService.bus.post(new BusEvents.HideEvent());
+    }
 
     @Override
     public void onDestroyView() {
@@ -346,7 +352,5 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         mMoviesRecyclerView.removeOnScrollListener(onScrollListener);
         mMoviesRecyclerView.setAdapter(null);
 
-        // hide when the view changed
-        PointerService.bus.post(new BusEvents.HideEvent());
     }
 }

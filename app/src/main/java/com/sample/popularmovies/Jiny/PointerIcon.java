@@ -63,7 +63,7 @@ public class PointerIcon {
         layoutParams = new WindowManager.LayoutParams(
                 100,
                 100,
-                WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+                WindowManager.LayoutParams.TYPE_TOAST,
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
                         | WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
                         | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
@@ -88,7 +88,7 @@ public class PointerIcon {
         }
     }
 
-    public void show() {
+    public void show(final float xCord, final float yCord, final int gravity) {
         try {
             if (bubbleView != null) {
 
@@ -98,12 +98,15 @@ public class PointerIcon {
                     public void run() {
                         //Do something after 100ms
                         bubbleView.setVisibility(View.VISIBLE);
+                        layoutParams.gravity = gravity;
+                        layoutParams.x = Math.round(xCord);
+                        layoutParams.y = Math.round(yCord);
+
+                        windowManager.updateViewLayout(bubbleView, layoutParams);
                     }
                 }, 1000);
 
 
-//                layoutParams.x = 0;
-//                layoutParams.y = totalScreenHeight / 2 - 100;
             }
         } catch (Exception e) {
             e.printStackTrace();

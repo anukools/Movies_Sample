@@ -14,6 +14,8 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
 
+import butterknife.internal.Utils;
+
 /**
  * Created by Anukool Srivastav on 4/29/2017.
  */
@@ -32,7 +34,7 @@ public class PointerService extends Service {
             this.context = contextThemeWrapper;
 
             WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-            LayoutInflater inflater = (LayoutInflater) contextThemeWrapper.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             pointerIcon = new PointerIcon(windowManager, context, inflater);
 //            pointerIcon.hide();
@@ -55,7 +57,7 @@ public class PointerService extends Service {
 
     @Subscribe
     public void showPointerUIEvent(BusEvents.ShowUIEvent event) {
-        pointerIcon.show();
+        pointerIcon.show(event.getX(), event.getY(), event.getGravity());
     }
 
     @Subscribe

@@ -3,6 +3,7 @@ package com.sample.popularmovies.app;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -11,11 +12,16 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.sample.popularmovies.BuildConfig;
+import com.sample.popularmovies.Jiny.AppUtils;
+import com.sample.popularmovies.Jiny.BusEvents;
+import com.sample.popularmovies.Jiny.PointerService;
 import com.sample.popularmovies.R;
 import com.sample.popularmovies.services.models.movieapi.Result;
 import com.squareup.picasso.Callback;
@@ -24,6 +30,7 @@ import com.squareup.picasso.Picasso;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.internal.Utils;
 
 /**
  * Created by Anukool Srivastav on 16/4/16.
@@ -156,5 +163,50 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        favouriteFab.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // hide when the view changed
+        PointerService.bus.post(new BusEvents.HideEvent());
+    }
+
+    ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
+        @Override
+        public void onGlobalLayout() {
+            // Layout has happened here.
+            // post event bus to show pointer
+            BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
+
+            Rect rect = new Rect();
+            favouriteFab.getGlobalVisibleRect(rect);
+
+            event.setX((AppUtils.getScreenWidth(getApplicationContext()) - rect.exactCenterX())/2);
+            event.setY((AppUtils.getScreenHeight(getApplicationContext()) - rect.exactCenterY())/2);
+            event.setGravity(Gravity.BOTTOM | Gravity.END);
+            PointerService.bus.post(event);
+
+            // Don't forget to remove your listener when you are done with it.
+            favouriteFab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        }
+    };
 
 }
+
