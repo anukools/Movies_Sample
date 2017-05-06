@@ -24,7 +24,9 @@ public class UIViewsHandler {
             event.setX(50);
             event.setY(AppUtils.getScreenHeight(context) / 2 - 100);
             event.setGravity(Gravity.TOP | Gravity.END);
+            event.setSoundResId(R.raw.feedback_1);
             PointerService.bus.post(event);
+
         }
     }
 }

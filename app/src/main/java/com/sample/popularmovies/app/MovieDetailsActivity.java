@@ -200,6 +200,7 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
 
             event.setX((AppUtils.getScreenWidth(getApplicationContext()) - rect.exactCenterX())/2);
             event.setY((AppUtils.getScreenHeight(getApplicationContext()) - rect.exactCenterY())/2);
+            event.setSoundResId(R.raw.feedback_2);
             event.setGravity(Gravity.BOTTOM | Gravity.END);
             PointerService.bus.post(event);
 

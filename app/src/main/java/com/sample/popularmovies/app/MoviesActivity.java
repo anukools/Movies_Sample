@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sample.popularmovies.Jiny.BusEvents;
 import com.sample.popularmovies.R;
 import com.sample.popularmovies.services.models.movieapi.Result;
 import com.sample.popularmovies.Jiny.PointerService;
@@ -32,6 +33,8 @@ public class MoviesActivity extends BaseActivity implements MoviesFragment.OnMov
     @Nullable
     boolean isTwoPane;
 
+    Intent uiServiceIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +45,7 @@ public class MoviesActivity extends BaseActivity implements MoviesFragment.OnMov
 
 
         // Start the Ui Service
-        Intent uiServiceIntent = new Intent(this, PointerService.class);
+        uiServiceIntent = new Intent(this, PointerService.class);
         startService(uiServiceIntent);
 
     }
@@ -96,5 +99,17 @@ public class MoviesActivity extends BaseActivity implements MoviesFragment.OnMov
 
     public boolean isTwoPaneContainer() {
         return isTwoPane;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // hide when the view changed
+        PointerService.bus.post(new BusEvents.RemoveEvent());
+
+        if (uiServiceIntent != null)
+            stopService(uiServiceIntent);
+
+
     }
 }

@@ -3,6 +3,7 @@ package com.sample.popularmovies.Jiny;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.view.ContextThemeWrapper;
@@ -26,6 +27,8 @@ public class PointerService extends Service {
     private PointerIcon pointerIcon;
     private Context context;
 
+    private SoundPlayer soundPlayer;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -38,6 +41,9 @@ public class PointerService extends Service {
 
             pointerIcon = new PointerIcon(windowManager, context, inflater);
 //            pointerIcon.hide();
+
+            // init sound player
+            soundPlayer = new SoundPlayer();
 
             PointerService.bus.register(this);
         } catch (Exception e) {
@@ -56,12 +62,29 @@ public class PointerService extends Service {
 
 
     @Subscribe
-    public void showPointerUIEvent(BusEvents.ShowUIEvent event) {
+    public void showPointerUIEvent(final BusEvents.ShowUIEvent event) {
         pointerIcon.show(event.getX(), event.getY(), event.getGravity());
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                soundPlayer.play(getApplicationContext(), event.getSoundResId());
+                //play(getApplicationContext(), soundResource);
+            }
+        }, 1000);
     }
 
     @Subscribe
     public void hidePointerUIEvent(BusEvents.HideEvent event) {
+        pointerIcon.hide();
+
+        soundPlayer.stop();
+
+    }
+
+    @Subscribe
+    public void removePointerUIEvent(BusEvents.RemoveEvent event) {
         pointerIcon.hide();
 
     }
@@ -78,7 +101,7 @@ public class PointerService extends Service {
         super.onDestroy();
 
         // remove views from the window
-        if(pointerIcon != null) {
+        if (pointerIcon != null) {
             pointerIcon.removePointer();
         }
 

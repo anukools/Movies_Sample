@@ -343,7 +343,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
 
         // hide when the view changed
-        PointerService.bus.post(new BusEvents.HideEvent());
+        PointerService.bus.post(new BusEvents.RemoveEvent());
     }
 
     @Override

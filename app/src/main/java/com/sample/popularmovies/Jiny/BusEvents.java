@@ -10,10 +10,23 @@ public class BusEvents {
 
     }
 
+    public static class RemoveEvent {
+
+    }
+
     public static class ShowUIEvent {
         float x;
         float y;
+        int soundResId;
         int gravity;
+
+        public int getSoundResId() {
+            return soundResId;
+        }
+
+        public void setSoundResId(int soundResId) {
+            this.soundResId = soundResId;
+        }
 
         public float getX() {
             return x;
