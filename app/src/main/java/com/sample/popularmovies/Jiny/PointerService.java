@@ -77,6 +77,13 @@ public class PointerService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
+        // remove views from the window
+        if(pointerIcon != null) {
+            pointerIcon.removePointer();
+        }
+
         PointerService.bus.unregister(this);
+
+
     }
 }

@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -111,5 +110,10 @@ public class PointerIcon {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void removePointer() {
+        if (bubbleView != null)
+            windowManager.removeView(bubbleView);
     }
 }

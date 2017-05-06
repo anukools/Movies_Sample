@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager;
 
 import com.sample.popularmovies.R;
 
@@ -14,7 +13,6 @@ import com.sample.popularmovies.R;
 
 public class UIViewsHandler {
     private static String TAG = "UIViewsHandler";
-    WindowManager windowManager;
 
     public static void handleHomePageView(Context context, View view) {
         // get home recycler view
