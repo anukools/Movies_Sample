@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.PersistableBundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sample.popularmovies.Jiny.AysncServices.TriggerViewEventAsyncTask;
 import com.sample.popularmovies.Jiny.BusEvents;
 import com.sample.popularmovies.R;
 import com.sample.popularmovies.services.models.movieapi.Result;
@@ -64,6 +66,11 @@ public class MoviesActivity extends BaseActivity implements MoviesFragment.OnMov
 
     public String getToolbarTitle() {
         return mToolbarTitle.getText().toString();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
@@ -138,6 +145,7 @@ public class MoviesActivity extends BaseActivity implements MoviesFragment.OnMov
 
     /**
      * if permission is granted then start UI service
+     *
      * @param requestCode
      * @param resultCode
      * @param data

@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.sample.popularmovies.BuildConfig;
 import com.sample.popularmovies.Jiny.AppUtils;
+import com.sample.popularmovies.Jiny.AysncServices.TriggerViewEventAsyncTask;
 import com.sample.popularmovies.Jiny.BusEvents;
 import com.sample.popularmovies.Jiny.PointerService;
 import com.sample.popularmovies.R;
@@ -136,6 +137,8 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
                     favoriteMoviesManager.add(movie);
                     updateFavouriteFab(true);
                 }
+                TriggerViewEventAsyncTask subscribe = new TriggerViewEventAsyncTask();
+                subscribe.execute("Home");
                 break;
         }
     }
@@ -198,8 +201,8 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
             Rect rect = new Rect();
             favouriteFab.getGlobalVisibleRect(rect);
 
-            event.setX((AppUtils.getScreenWidth(getApplicationContext()) - rect.exactCenterX())/2);
-            event.setY((AppUtils.getScreenHeight(getApplicationContext()) - rect.exactCenterY())/2);
+            event.setX((AppUtils.getScreenWidth(getApplicationContext()) - rect.exactCenterX()) / 2);
+            event.setY((AppUtils.getScreenHeight(getApplicationContext()) - rect.exactCenterY()) / 2);
             event.setSoundResId(R.raw.feedback_2);
             event.setGravity(Gravity.BOTTOM | Gravity.END);
             PointerService.bus.post(event);

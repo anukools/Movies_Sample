@@ -24,4 +24,8 @@ public interface RestInterface {
     @GET("/movie/{id}/reviews?api_key=" + BuildConfig.MOVIE_API_KEY)
     void getMovieReviews(@Path("id") int id, Callback<Reviews> cb);
 
+
+    @GET("/movie/{id}/reviews?api_key=" + BuildConfig.MOVIE_API_KEY)
+    void get(@Path("id") int id, Callback<Reviews> cb);
+
 }
