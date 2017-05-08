@@ -15,8 +15,6 @@ import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 import com.squareup.otto.ThreadEnforcer;
 
-import butterknife.internal.Utils;
-
 /**
  * Created by Anukool Srivastav on 4/29/2017.
  */
@@ -70,7 +68,6 @@ public class PointerService extends Service {
             @Override
             public void run() {
                 soundPlayer.play(getApplicationContext(), event.getSoundResId());
-                //play(getApplicationContext(), soundResource);
             }
         }, 1000);
     }

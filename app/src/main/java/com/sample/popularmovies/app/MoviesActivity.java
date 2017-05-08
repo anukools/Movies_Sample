@@ -1,9 +1,12 @@
 package com.sample.popularmovies.app;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -35,6 +38,8 @@ public class MoviesActivity extends BaseActivity implements MoviesFragment.OnMov
 
     Intent uiServiceIntent;
 
+    public final static int REQUEST_CODE = 10101;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,10 +48,7 @@ public class MoviesActivity extends BaseActivity implements MoviesFragment.OnMov
         setSupportActionBar(mToolbar);
         isTwoPane = findViewById(R.id.movie_details_container) != null;
 
-
-        // Start the Ui Service
-        uiServiceIntent = new Intent(this, PointerService.class);
-        startService(uiServiceIntent);
+        checkDrawOverlayPermission();
 
     }
 
@@ -111,5 +113,53 @@ public class MoviesActivity extends BaseActivity implements MoviesFragment.OnMov
             stopService(uiServiceIntent);
 
 
+    }
+
+    /**
+     * Checks for draw over the apps permisson
+     *
+     * @return
+     */
+    public boolean checkDrawOverlayPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            startUIService();
+            return true;
+        }
+        if (!Settings.canDrawOverlays(this)) {
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, REQUEST_CODE);
+            return false;
+        } else {
+            startUIService();
+            return true;
+        }
+    }
+
+    /**
+     * if permission is granted then start UI service
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
+    @Override
+    @TargetApi(Build.VERSION_CODES.M)
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE) {
+            if (Settings.canDrawOverlays(this)) {
+               startUIService();
+            }
+        }
+    }
+
+    private void startUIService(){
+        // Start the Ui Service
+        uiServiceIntent = new Intent(this, PointerService.class);
+        startService(uiServiceIntent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 }
