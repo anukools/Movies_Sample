@@ -15,6 +15,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.sample.popularmovies.Jiny.AppUtils;
+import com.sample.popularmovies.Jiny.AysncServices.AsyncResponseInterface;
+import com.sample.popularmovies.Jiny.AysncServices.TriggerViewEventAsyncTask;
 import com.sample.popularmovies.Jiny.BusEvents;
 import com.sample.popularmovies.Jiny.PointerService;
 import com.sample.popularmovies.R;
@@ -332,9 +336,31 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         super.onResume();
         getActivity().registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
+        sendTriggerBasedEvent();
         // handler draw over view
-        UIViewsHandler.handleHomePageView(getActivity(), rootView);
+//        UIViewsHandler.handleHomePageView(getActivity(), rootView);
     }
+
+    private void sendTriggerBasedEvent() {
+        TriggerViewEventAsyncTask asyncTask = new TriggerViewEventAsyncTask(asyncResponseInterface);
+        asyncTask.execute("1"); //  1 for home screen
+    }
+
+    AsyncResponseInterface asyncResponseInterface = new AsyncResponseInterface() {
+        @Override
+        public void onSuccess(String response) {
+            Log.e("Response :", response + "");
+            if (response != null && response.equalsIgnoreCase("Home")) {
+                // post event bus to show pointer
+                BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
+                event.setX(50);
+                event.setY(AppUtils.getScreenHeight(getActivity()) / 2 - 100);
+                event.setGravity(Gravity.TOP | Gravity.END);
+                event.setSoundResId(R.raw.feedback_1);
+                PointerService.bus.post(event);
+            }
+        }
+    };
 
     @Override
     public void onPause() {

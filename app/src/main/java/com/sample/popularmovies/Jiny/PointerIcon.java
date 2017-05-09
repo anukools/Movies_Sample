@@ -55,6 +55,7 @@ public class PointerIcon {
     private void createBubble() {
         bubbleView = (ImageView) inflater.inflate(R.layout.dummy_layout, null, false);
         bubbleView.setBackgroundResource(R.drawable.pointer_animation);
+        bubbleView.setVisibility(View.GONE);
         AnimationDrawable animationDrawable = (AnimationDrawable) bubbleView.getBackground();
         animationDrawable.start();
         animationDrawable.setOneShot(false);
@@ -103,7 +104,7 @@ public class PointerIcon {
 
                         windowManager.updateViewLayout(bubbleView, layoutParams);
                     }
-                }, 1000);
+                }, 300);
 
 
             }

@@ -67,7 +67,7 @@ public class PointerService extends Service {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                soundPlayer.play(getApplicationContext(), event.getSoundResId());
+//                soundPlayer.play(getApplicationContext(), event.getSoundResId());
             }
         }, 1000);
     }
@@ -76,7 +76,7 @@ public class PointerService extends Service {
     public void hidePointerUIEvent(BusEvents.HideEvent event) {
         pointerIcon.hide();
 
-        soundPlayer.stop();
+//        soundPlayer.stop();
 
     }
 

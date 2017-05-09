@@ -12,6 +12,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 
 import com.sample.popularmovies.BuildConfig;
 import com.sample.popularmovies.Jiny.AppUtils;
+import com.sample.popularmovies.Jiny.AysncServices.AsyncResponseInterface;
 import com.sample.popularmovies.Jiny.AysncServices.TriggerViewEventAsyncTask;
 import com.sample.popularmovies.Jiny.BusEvents;
 import com.sample.popularmovies.Jiny.PointerService;
@@ -137,8 +139,6 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
                     favoriteMoviesManager.add(movie);
                     updateFavouriteFab(true);
                 }
-                TriggerViewEventAsyncTask subscribe = new TriggerViewEventAsyncTask();
-                subscribe.execute("Home");
                 break;
         }
     }
@@ -175,7 +175,9 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
     protected void onStart() {
         super.onStart();
 
-        favouriteFab.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
+        sendTriggerBasedEvent();
+
+//        favouriteFab.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
     }
 
     @Override
@@ -191,26 +193,47 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
         PointerService.bus.post(new BusEvents.HideEvent());
     }
 
+
+    private void sendTriggerBasedEvent() {
+        TriggerViewEventAsyncTask subscribe = new TriggerViewEventAsyncTask(asyncResponseInterface);
+        subscribe.execute("2"); //  2 for details screen
+    }
+
     ViewTreeObserver.OnGlobalLayoutListener globalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
         @Override
         public void onGlobalLayout() {
             // Layout has happened here.
-            // post event bus to show pointer
-            BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
 
-            Rect rect = new Rect();
-            favouriteFab.getGlobalVisibleRect(rect);
-
-            event.setX((AppUtils.getScreenWidth(getApplicationContext()) - rect.exactCenterX()) / 2);
-            event.setY((AppUtils.getScreenHeight(getApplicationContext()) - rect.exactCenterY()) / 2);
-            event.setSoundResId(R.raw.feedback_2);
-            event.setGravity(Gravity.BOTTOM | Gravity.END);
-            PointerService.bus.post(event);
+            sendViewEvent();
 
             // Don't forget to remove your listener when you are done with it.
             favouriteFab.getViewTreeObserver().removeOnGlobalLayoutListener(this);
         }
     };
 
+
+    AsyncResponseInterface asyncResponseInterface = new AsyncResponseInterface() {
+        @Override
+        public void onSuccess(String response) {
+            Log.e("Response :", response + "");
+            if (response != null && response.equalsIgnoreCase("Details")) {
+                sendViewEvent();
+            }
+        }
+    };
+
+    private void sendViewEvent(){
+        // post event bus to show pointer
+        BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
+
+        Rect rect = new Rect();
+        favouriteFab.getGlobalVisibleRect(rect);
+
+        event.setX((AppUtils.getScreenWidth(getApplicationContext()) - rect.exactCenterX()) / 2);
+        event.setY((AppUtils.getScreenHeight(getApplicationContext()) - rect.exactCenterY()) / 2);
+        event.setSoundResId(R.raw.feedback_2);
+        event.setGravity(Gravity.BOTTOM | Gravity.END);
+        PointerService.bus.post(event);
+    }
 }
 

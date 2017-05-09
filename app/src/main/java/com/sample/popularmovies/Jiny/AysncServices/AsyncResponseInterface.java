@@ -6,5 +6,4 @@ package com.sample.popularmovies.Jiny.AysncServices;
 
 public interface AsyncResponseInterface {
     void onSuccess(String response);
-    void onFailure(String failure);
 }

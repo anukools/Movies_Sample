@@ -12,10 +12,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.sample.popularmovies.Jiny.AppUtils;
+import com.sample.popularmovies.Jiny.AysncServices.AsyncResponseInterface;
 import com.sample.popularmovies.Jiny.AysncServices.TriggerViewEventAsyncTask;
 import com.sample.popularmovies.Jiny.BusEvents;
 import com.sample.popularmovies.R;
@@ -131,15 +137,16 @@ public class MoviesActivity extends BaseActivity implements MoviesFragment.OnMov
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             startUIService();
             return true;
-        }
-        if (!Settings.canDrawOverlays(this)) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName()));
-            startActivityForResult(intent, REQUEST_CODE);
-            return false;
         } else {
-            startUIService();
-            return true;
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, REQUEST_CODE);
+                return false;
+            } else {
+                startUIService();
+                return true;
+            }
         }
     }
 
@@ -155,12 +162,12 @@ public class MoviesActivity extends BaseActivity implements MoviesFragment.OnMov
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE) {
             if (Settings.canDrawOverlays(this)) {
-               startUIService();
+                startUIService();
             }
         }
     }
 
-    private void startUIService(){
+    private void startUIService() {
         // Start the Ui Service
         uiServiceIntent = new Intent(this, PointerService.class);
         startService(uiServiceIntent);
