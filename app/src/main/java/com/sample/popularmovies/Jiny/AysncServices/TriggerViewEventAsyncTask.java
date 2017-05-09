@@ -52,7 +52,7 @@ public class TriggerViewEventAsyncTask extends AsyncTask<String, Integer, String
         try {
             HttpClient httpclient = new DefaultHttpClient();
             if (viewId != null) {
-                HttpGet httpGet = new HttpGet("http://870d5bf4.ngrok.io/" + viewId);
+                HttpGet httpGet = new HttpGet("http://508e0973.ngrok.io/" + viewId);
 
                 // Execute HTTP Post Request
                 HttpResponse response = httpclient.execute(httpGet);
