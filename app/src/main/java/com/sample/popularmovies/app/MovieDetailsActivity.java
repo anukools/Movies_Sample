@@ -175,9 +175,9 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
     protected void onStart() {
         super.onStart();
 
-        sendTriggerBasedEvent();
+//        sendTriggerBasedEvent();
 
-//        favouriteFab.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
+        favouriteFab.getViewTreeObserver().addOnGlobalLayoutListener(globalLayoutListener);
     }
 
     @Override

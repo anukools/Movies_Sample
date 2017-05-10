@@ -23,6 +23,7 @@ public class PointerService extends Service {
     public static Bus bus = new Bus(ThreadEnforcer.ANY);
     private String TAG = this.getClass().toString();
     private PointerIcon pointerIcon;
+    private JinyIcon jinyIcon;
     private Context context;
 
     private SoundPlayer soundPlayer;
@@ -38,7 +39,7 @@ public class PointerService extends Service {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
             pointerIcon = new PointerIcon(windowManager, context, inflater);
-//            pointerIcon.hide();
+            jinyIcon = new JinyIcon(windowManager, context, inflater);
 
             // init sound player
             soundPlayer = new SoundPlayer();
@@ -62,6 +63,7 @@ public class PointerService extends Service {
     @Subscribe
     public void showPointerUIEvent(final BusEvents.ShowUIEvent event) {
         pointerIcon.show(event.getX(), event.getY(), event.getGravity());
+        jinyIcon.show();
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -75,7 +77,7 @@ public class PointerService extends Service {
     @Subscribe
     public void hidePointerUIEvent(BusEvents.HideEvent event) {
         pointerIcon.hide();
-
+        jinyIcon.hide();
         soundPlayer.stop();
 
     }
@@ -83,6 +85,7 @@ public class PointerService extends Service {
     @Subscribe
     public void removePointerUIEvent(BusEvents.RemoveEvent event) {
         pointerIcon.hide();
+        jinyIcon.hide();
 
     }
 
@@ -100,6 +103,10 @@ public class PointerService extends Service {
         // remove views from the window
         if (pointerIcon != null) {
             pointerIcon.removePointer();
+        }
+        // remove views from the window
+        if (jinyIcon != null) {
+            jinyIcon.removePointer();
         }
 
         PointerService.bus.unregister(this);

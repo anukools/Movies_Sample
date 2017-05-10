@@ -30,6 +30,15 @@ public class AppUtils {
         return sScreenSize.y;
     }
 
+    public static int dpToPx(Context context, int dp) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        return (int) ((dp * displayMetrics.density) + 0.5);
+    }
+
+    public static float dist(double posX, double posY, double pos2X, double pos2Y) {
+        return (float) Math.sqrt(Math.pow(pos2X - posX, 2) + Math.pow(pos2Y - posY, 2));
+    }
+
     private static void fetchScreenSize(Context context) {
         int softButtonsHeight = 0;
         if (sScreenSize != null) return;

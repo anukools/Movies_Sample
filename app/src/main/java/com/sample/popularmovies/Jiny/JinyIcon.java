@@ -3,7 +3,6 @@ package com.sample.popularmovies.Jiny;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -11,32 +10,31 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.sample.popularmovies.Jiny.AysncServices.JinyIconView;
 import com.sample.popularmovies.R;
 
 /**
- * Created by Anukool Srivastav on 4/29/2017.
+ * Created by Anukool Srivastav on 5/10/2017.
  */
 
-public class PointerIcon {
-
-    private String TAG = this.getClass().getSimpleName();
-
-
+public class JinyIcon {
     private WindowManager windowManager;
     private Context context;
     private LayoutInflater inflater;
 
     private WindowManager.LayoutParams layoutParams;
 
+    private JinyIconView jinyIconView;
 
     // dimensions
     private int totalScreenWidth;
     private int totalScreenHeight;
     private int statusBarHeight;
 
-    private ImageView pointerView;
+    private ImageView jinyView;
+    private int jinyRightMargin = 150;
 
-    public PointerIcon(WindowManager windowManager, Context context, LayoutInflater inflater) {
+    public JinyIcon(WindowManager windowManager, Context context, LayoutInflater inflater) {
         this.windowManager = windowManager;
         this.context = context;
         this.inflater = inflater;
@@ -46,19 +44,16 @@ public class PointerIcon {
         statusBarHeight = AppUtils.getStatusBarHeight(context);
 
         try {
-            this.createPointerView();
+            this.createBubble();
+            jinyIconView = new JinyIconView(this, windowManager, context);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void createPointerView() {
-        pointerView = (ImageView) inflater.inflate(R.layout.dummy_layout, null, false);
-        pointerView.setBackgroundResource(R.drawable.pointer_animation);
-        pointerView.setVisibility(View.GONE);
-        AnimationDrawable animationDrawable = (AnimationDrawable) pointerView.getBackground();
-        animationDrawable.start();
-        animationDrawable.setOneShot(false);
+    private void createBubble() {
+        jinyView = (ImageView) inflater.inflate(R.layout.jiny_icon, null, false);
+        jinyView.setVisibility(View.GONE);
 
         layoutParams = new WindowManager.LayoutParams(
                 100,
@@ -69,40 +64,42 @@ public class PointerIcon {
                         | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                         | WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 PixelFormat.TRANSLUCENT);
-        layoutParams.gravity = Gravity.TOP | Gravity.END;
-        layoutParams.x = 0;
-        layoutParams.y = totalScreenHeight / 2 - 150;
+        layoutParams.gravity = Gravity.TOP | Gravity.START;
+        layoutParams.x = totalScreenWidth - jinyRightMargin;
+        layoutParams.y = totalScreenHeight / 3;
         layoutParams.dimAmount = 0.6f;
         layoutParams.screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
 
-        windowManager.addView(pointerView, layoutParams);
+        windowManager.addView(jinyView, layoutParams);
 
     }
 
 
     public void hide() {
-        if (pointerView != null) {
-            if (pointerView.getVisibility() == View.VISIBLE) {
-                pointerView.setVisibility(View.GONE);
+        if (jinyView != null) {
+            if (jinyView.getVisibility() == View.VISIBLE) {
+                jinyView.setVisibility(View.GONE);
             }
         }
     }
 
-    public void show(final float xCord, final float yCord, final int gravity) {
+    public void show() {
         try {
-            if (pointerView != null) {
+            if (jinyView != null) {
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         //Do something after 100ms
-                        pointerView.setVisibility(View.VISIBLE);
-                        layoutParams.gravity = gravity;
-                        layoutParams.x = Math.round(xCord);
-                        layoutParams.y = Math.round(yCord);
+                        jinyView.setVisibility(View.VISIBLE);
 
-                        windowManager.updateViewLayout(pointerView, layoutParams);
+                        layoutParams.x = totalScreenWidth - jinyRightMargin;
+                        layoutParams.y = totalScreenHeight / 3 - 100;
+                        jinyIconView.moveJinyIconDirectly(layoutParams.x, layoutParams.y);
+
+                        jinyView.bringToFront();
+
                     }
                 }, 500);
 
@@ -114,7 +111,12 @@ public class PointerIcon {
     }
 
     public void removePointer() {
-        if (pointerView != null)
-            windowManager.removeView(pointerView);
+        if (jinyView != null)
+            windowManager.removeView(jinyView);
+    }
+
+    public View getView() {
+        return jinyView;
     }
 }
+

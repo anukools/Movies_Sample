@@ -336,9 +336,21 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         super.onResume();
         getActivity().registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
 
-        sendTriggerBasedEvent();
+
+//        sendTriggerBasedEvent();
         // handler draw over view
-//        UIViewsHandler.handleHomePageView(getActivity(), rootView);
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //Do something after 100ms
+                UIViewsHandler.handleHomePageView(getActivity(), rootView);
+            }
+        }, 500);
+
+
+
     }
 
     private void sendTriggerBasedEvent() {
