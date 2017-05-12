@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,6 +84,7 @@ public class PointerIcon {
     public void hide() {
         if (pointerView != null) {
             if (pointerView.getVisibility() == View.VISIBLE) {
+                Log.e("Pointer :", "hide");
                 pointerView.setVisibility(View.GONE);
             }
         }
@@ -91,7 +93,7 @@ public class PointerIcon {
     public void show(final float xCord, final float yCord, final int gravity) {
         try {
             if (pointerView != null) {
-
+                Log.e("Pointer :", "Show");
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -111,6 +113,18 @@ public class PointerIcon {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void animateView(int x, int y) {
+        if (pointerView.getVisibility() == View.GONE) {
+            pointerView.setVisibility(View.VISIBLE);
+        }
+        layoutParams.x = Math.round(x);
+        layoutParams.y = Math.round(y);
+
+        Log.e("Animate pointers : ", x + " -- " + y);
+        windowManager.updateViewLayout(pointerView, layoutParams);
+
     }
 
     public void removePointer() {

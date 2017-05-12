@@ -76,9 +76,19 @@ public class PointerService extends Service {
 
     @Subscribe
     public void hidePointerUIEvent(BusEvents.HideEvent event) {
-        pointerIcon.hide();
-        jinyIcon.hide();
+        if (event.isHidePointer()) {
+            pointerIcon.hide();
+        }
+
+        if(event.isHideJinyIcon()){
+            jinyIcon.hide();
+        }
         soundPlayer.stop();
+   }
+
+    @Subscribe
+    public void animatePointerUIEvent(BusEvents.AnimateEvent event) {
+        pointerIcon.animateView(event.getX(), event.getY());
 
     }
 

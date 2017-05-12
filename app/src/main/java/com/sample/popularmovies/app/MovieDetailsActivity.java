@@ -8,8 +8,10 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -38,9 +40,12 @@ import butterknife.internal.Utils;
 /**
  * Created by Anukool Srivastav on 16/4/16.
  */
-public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFragment.IMovieTrailerSetListener {
+public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFragment.IMovieTrailerSetListener,
+        AppBarLayout.OnOffsetChangedListener {
 
     MovieDetailsFragment movieDetailsFragment;
+    @BindView(R.id.app_bar_layout)
+    AppBarLayout appBarLayout;
     @BindView(R.id.collapsing_toolbar)
     CollapsingToolbarLayout mCollapsingToolbarLayout;
     @BindView(R.id.movie_image_banner)
@@ -53,6 +58,10 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
     private String youTubeVideoId;
     private FavoriteMoviesManager favoriteMoviesManager;
 
+
+    private static final int PERCENTAGE_TO_SHOW_IMAGE = 90;
+    private int mMaxScrollSize;
+    private boolean mIsImageHidden;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +82,46 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
         }
     }
 
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+
+        if(favouriteFab.getVisibility() == View.VISIBLE && favouriteFab.getX() != 0) {
+            sendViewAnimateEvent();
+        }else {
+            BusEvents.HideEvent hideEvent = new BusEvents.HideEvent();
+            hideEvent.setHideJinyIcon(false);
+            PointerService.bus.post(hideEvent);
+        }
+        if (mMaxScrollSize == 0)
+            mMaxScrollSize = appBarLayout.getTotalScrollRange();
+
+        int currentScrollPercentage = (Math.abs(verticalOffset)) * 100 / mMaxScrollSize;
+
+        if (currentScrollPercentage >= PERCENTAGE_TO_SHOW_IMAGE) {
+            if (!mIsImageHidden) {
+                mIsImageHidden = true;
+
+                ViewCompat.animate(favouriteFab).scaleY(0).scaleX(0).start();
+                /**
+                 * Realize your any behavior for FAB here!
+                 **/
+            }
+        }
+
+        if (currentScrollPercentage < PERCENTAGE_TO_SHOW_IMAGE) {
+            if (mIsImageHidden) {
+                mIsImageHidden = false;
+                ViewCompat.animate(favouriteFab).scaleY(1).scaleX(1).start();
+                /**
+                 * Realize your any behavior for FAB here!
+                 **/
+            }
+        }
+    }
+
     void init() {
         favoriteMoviesManager = FavoriteMoviesManager.create(this);
+        appBarLayout.addOnOffsetChangedListener(this);
         setDataToViews();
     }
 
@@ -222,18 +269,37 @@ public class MovieDetailsActivity extends BaseActivity implements MovieDetailsFr
         }
     };
 
-    private void sendViewEvent(){
-        // post event bus to show pointer
-        BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
-
+    private void sendViewAnimateEvent() {
+        BusEvents.AnimateEvent animateEvent = new BusEvents.AnimateEvent();
         Rect rect = new Rect();
         favouriteFab.getGlobalVisibleRect(rect);
 
-        event.setX((AppUtils.getScreenWidth(getApplicationContext()) - rect.exactCenterX()) / 2);
-        event.setY((AppUtils.getScreenHeight(getApplicationContext()) - rect.exactCenterY()) / 2);
-        event.setSoundResId(R.raw.feedback_2);
-        event.setGravity(Gravity.BOTTOM | Gravity.END);
-        PointerService.bus.post(event);
+        int heightDiff= (int) (maxHeight - rect.exactCenterY());
+
+        Log.e("Values : ", "---- X -  " + rect.exactCenterX() + " -- Y - " + rect.exactCenterY());
+
+        animateEvent.setX((int) ((AppUtils.getScreenWidth(getApplicationContext()) - rect.exactCenterX()) / 2));
+        animateEvent.setY((int) ((AppUtils.getScreenHeight(getApplicationContext()) - rect.exactCenterY()) / 2) - heightDiff);
+        PointerService.bus.post(animateEvent);
+    }
+
+    private int maxHeight = 0;
+    private void sendViewEvent() {
+        if (favouriteFab.getVisibility() == View.VISIBLE) {
+            // post event bus to show pointer
+            BusEvents.ShowUIEvent event = new BusEvents.ShowUIEvent();
+
+            Rect rect = new Rect();
+            favouriteFab.getGlobalVisibleRect(rect);
+
+            maxHeight = (int) rect.exactCenterY();
+
+            event.setX((AppUtils.getScreenWidth(getApplicationContext()) - rect.exactCenterX()) / 2);
+            event.setY((AppUtils.getScreenHeight(getApplicationContext()) - rect.exactCenterY()) / 2);
+            event.setSoundResId(R.raw.feedback_2);
+            event.setGravity(Gravity.TOP | Gravity.END);
+            PointerService.bus.post(event);
+        }
     }
 }
 
